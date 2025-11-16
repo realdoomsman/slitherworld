@@ -274,6 +274,27 @@ export default function GameCanvas({ lobbyId }: GameCanvasProps) {
     <div className="relative w-full h-screen bg-black">
       <canvas ref={canvasRef} className="w-full h-full" />
       
+      {/* Waiting Screen */}
+      {!gameState && (
+        <div className="absolute inset-0 bg-black flex items-center justify-center">
+          <div className="text-center">
+            <div className="mb-8">
+              <div className="w-20 h-20 rounded-full bg-green-500/20 border-4 border-green-500 flex items-center justify-center mx-auto mb-6 animate-pulse">
+                <div className="w-10 h-10 rounded-full bg-green-500"></div>
+              </div>
+              <h2 className="text-4xl font-bold text-green-400 mb-4">Waiting for Game to Start</h2>
+              <p className="text-xl text-gray-400 mb-2">Lobby: {lobbyId.slice(0, 8)}...</p>
+              <p className="text-gray-500">Game will start when minimum players join</p>
+            </div>
+            <div className="flex items-center justify-center gap-2">
+              <div className="w-3 h-3 bg-green-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+              <div className="w-3 h-3 bg-green-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+              <div className="w-3 h-3 bg-green-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+            </div>
+          </div>
+        </div>
+      )}
+      
       {/* Death Overlay */}
       {isDead && !gameOver && (
         <div className="absolute inset-0 bg-gradient-to-b from-red-900/50 to-black/80 backdrop-blur-sm flex items-center justify-center pointer-events-none">
