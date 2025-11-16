@@ -147,15 +147,26 @@ export default function Home() {
 
       {/* Hero Section */}
       <div className="relative z-10 flex flex-col items-center justify-center px-4 md:px-8 py-12 md:py-20">
-        <h1 className="text-4xl md:text-6xl font-bold text-center mb-4 text-green-400">
-          SLITHER.WORLD
-        </h1>
-        <p className="text-lg md:text-xl text-center mb-3 text-gray-300">
+        <div className="mb-6 relative">
+          <div className="absolute inset-0 bg-green-500/20 blur-3xl animate-pulse"></div>
+          <h1 className="text-5xl md:text-7xl font-bold text-center mb-4 relative bg-gradient-to-r from-green-400 via-emerald-400 to-green-500 bg-clip-text text-transparent animate-pulse">
+            SLITHER.WORLD
+          </h1>
+        </div>
+        <p className="text-xl md:text-2xl text-center mb-3 text-gray-200 font-semibold">
           Multiplayer Snake Battles on Solana
         </p>
-        <p className="text-sm md:text-base text-center mb-8 text-gray-500 max-w-2xl">
-          Winner takes 80% • 15% Buybacks • Pure Skill
-        </p>
+        <div className="flex items-center gap-3 mb-8">
+          <div className="px-4 py-2 bg-green-500/10 border border-green-500/30 rounded-full">
+            <span className="text-green-400 font-bold">80% Winner</span>
+          </div>
+          <div className="px-4 py-2 bg-green-500/10 border border-green-500/30 rounded-full">
+            <span className="text-green-400 font-bold">15% Buybacks</span>
+          </div>
+          <div className="px-4 py-2 bg-green-500/10 border border-green-500/30 rounded-full">
+            <span className="text-green-400 font-bold">Pure Skill</span>
+          </div>
+        </div>
 
         {/* Auth Flow */}
         {!mounted ? (
@@ -199,7 +210,7 @@ export default function Home() {
         {/* Game Modes */}
         {isAuthenticated && (
           <div className="w-full max-w-5xl">
-            <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 text-white">Select Game Mode</h2>
+            <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">Select Game Mode</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {lobbyTypes.map((lobby) => (
                 <button
@@ -207,13 +218,14 @@ export default function Home() {
                   onClick={() => handleJoinLobby(lobby.type)}
                   className={`${
                     lobby.type === 'WHALE' 
-                      ? 'bg-gradient-to-br from-green-600 to-emerald-700 md:col-span-2 lg:col-span-3 border-2 border-green-400' 
+                      ? 'bg-gradient-to-br from-green-600 to-emerald-700 md:col-span-2 lg:col-span-3 border-2 border-green-400 shadow-lg shadow-green-500/50' 
                       : lobby.fee === 0
-                      ? 'bg-gradient-to-br from-green-600/80 to-emerald-600/80 border border-green-500/50'
-                      : 'bg-gradient-to-br from-gray-800 to-gray-900 border border-green-500/30'
-                  } p-6 rounded-xl hover:scale-105 hover:border-green-400 transition-all text-left`}
+                      ? 'bg-gradient-to-br from-green-600/80 to-emerald-600/80 border border-green-500/50 shadow-md shadow-green-500/30'
+                      : 'bg-gradient-to-br from-gray-800 to-gray-900 border border-green-500/30 hover:shadow-md hover:shadow-green-500/20'
+                  } p-6 rounded-xl hover:scale-105 hover:border-green-400 transition-all text-left relative overflow-hidden group`}
                 >
-                  <div className="flex justify-between items-start mb-3">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-green-500/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+                  <div className="flex justify-between items-start mb-3 relative z-10">
                     <div>
                       <h3 className="text-xl font-bold mb-1 text-white">
                         {lobby.name}
@@ -253,9 +265,9 @@ export default function Home() {
         {/* How to Play */}
         {!isAuthenticated && (
           <div className="w-full max-w-4xl mt-16 px-4">
-            <h2 className="text-2xl font-bold text-center mb-8 text-green-400">How It Works</h2>
+            <h2 className="text-3xl font-bold text-center mb-8 bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">How It Works</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-              <div className="p-6 bg-gray-900/50 rounded-lg border border-green-500/20">
+              <div className="p-6 bg-gray-900/50 rounded-lg border border-green-500/20 hover:border-green-500/50 hover:bg-gray-900/70 transition-all hover:scale-105">
                 <div className="w-12 h-12 rounded-full bg-green-500/20 border-2 border-green-500 flex items-center justify-center mb-4 mx-auto">
                   <span className="text-green-400 font-bold">1</span>
                 </div>
@@ -279,8 +291,8 @@ export default function Home() {
             </div>
 
             {/* Token Info */}
-            <div className="p-6 bg-gray-900/50 rounded-lg border border-green-500/20">
-              <h3 className="text-lg font-bold mb-4 text-green-400 text-center">Token Contract</h3>
+            <div className="p-6 bg-gradient-to-br from-gray-900/80 to-gray-900/50 rounded-lg border border-green-500/30 shadow-lg shadow-green-500/10 hover:shadow-green-500/20 transition-all">
+              <h3 className="text-xl font-bold mb-4 bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent text-center">Token Contract</h3>
               <div className="flex items-center justify-center gap-3">
                 <code className="px-4 py-2 bg-black/50 rounded text-green-400 text-sm font-mono">
                   Coming Soon
