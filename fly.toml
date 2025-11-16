@@ -1,55 +1,58 @@
-app = "slither-game-server"
-primary_region = "sjc"
+# fly.toml app configuration file generated for slither-game-server-floral-dew-6163 on 2025-11-16T15:42:33-05:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'slither-game-server-floral-dew-6163'
+primary_region = 'sjc'
 
 [build]
-  [build.args]
-    NODE_VERSION = "20"
 
 [env]
-  PORT = "3001"
-  NODE_ENV = "production"
+  NODE_ENV = 'production'
+  PORT = '3001'
+
+[http_service]
+  internal_port = 3001
+  force_https = true
+  auto_stop_machines = 'off'
+  auto_start_machines = true
+  min_machines_running = 1
 
 [[services]]
+  protocol = 'tcp'
   internal_port = 3001
-  protocol = "tcp"
-  auto_stop_machines = false
+  auto_stop_machines = 'off'
   auto_start_machines = true
   min_machines_running = 1
 
   [[services.ports]]
     port = 80
-    handlers = ["http"]
+    handlers = ['http']
     force_https = true
 
   [[services.ports]]
     port = 443
-    handlers = ["tls", "http"]
+    handlers = ['tls', 'http']
 
   [services.concurrency]
-    type = "connections"
+    type = 'connections'
     hard_limit = 1000
     soft_limit = 800
 
   [[services.tcp_checks]]
-    interval = "15s"
-    timeout = "2s"
-    grace_period = "10s"
+    interval = '15s'
+    timeout = '2s'
+    grace_period = '10s'
 
   [[services.http_checks]]
-    interval = "30s"
-    timeout = "5s"
-    grace_period = "10s"
-    method = "get"
-    path = "/health"
-
-[http_service]
-  internal_port = 3001
-  force_https = true
-  auto_stop_machines = false
-  auto_start_machines = true
-  min_machines_running = 1
+    interval = '30s'
+    timeout = '5s'
+    grace_period = '10s'
+    method = 'get'
+    path = '/health'
 
 [[vm]]
-  cpu_kind = "shared"
+  memory = '2gb'
+  cpu_kind = 'shared'
   cpus = 2
-  memory_mb = 2048

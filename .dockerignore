@@ -3,6 +3,7 @@ node_modules
 .git
 .env
 .env.local
+.env.production
 *.log
 npm-debug.log*
 .DS_Store
@@ -11,3 +12,4 @@ coverage
 .idea
 *.md
 !README.md
+.vercel
