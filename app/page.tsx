@@ -115,9 +115,7 @@ export default function Home() {
       {/* Navigation Bar */}
       <nav className="relative z-10 flex justify-between items-center p-4 md:p-6 border-b border-green-500/20 bg-gray-900/80 backdrop-blur-sm">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-green-500/20 border-2 border-green-500 flex items-center justify-center">
-            <div className="w-4 h-4 rounded-full bg-green-500"></div>
-          </div>
+          <img src="/icon.svg" alt="Slither.World" className="w-10 h-10" />
           <span className="text-xl md:text-2xl font-bold text-green-400">SLITHER.WORLD</span>
         </div>
         <div className="hidden md:flex gap-6 items-center mr-4">
@@ -306,9 +304,21 @@ export default function Home() {
           </div>
         )}
 
-        {mounted && process.env.NEXT_PUBLIC_DEV_MODE === 'true' && (
-          <div className="mt-8 px-6 py-3 bg-yellow-900/30 border border-yellow-500 rounded-lg">
-            <p className="text-yellow-400 font-semibold text-sm">DEV MODE: Games start with 1 player</p>
+        {/* Demo Mode */}
+        {!isAuthenticated && (
+          <div className="w-full max-w-4xl mt-12 px-4">
+            <div className="p-8 bg-gradient-to-br from-green-900/20 to-emerald-900/20 rounded-xl border border-green-500/30">
+              <h3 className="text-2xl font-bold text-center mb-4 text-green-400">Try Demo Mode</h3>
+              <p className="text-center text-gray-400 mb-6">Play instantly without connecting a wallet - no waiting, no fees</p>
+              <div className="flex justify-center">
+                <a
+                  href="/game?demo=true"
+                  className="px-8 py-4 bg-green-600 hover:bg-green-700 rounded-lg font-bold text-lg transition-all hover:scale-105 shadow-lg shadow-green-500/30"
+                >
+                  Play Demo Now
+                </a>
+              </div>
+            </div>
           </div>
         )}
       </div>
