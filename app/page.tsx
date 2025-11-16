@@ -108,9 +108,9 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-gray-950">
+    <div className="min-h-screen relative overflow-hidden bg-black">
       {/* Subtle Background */}
-      <div className="absolute inset-0 grid-background opacity-20"></div>
+      <div className="absolute inset-0 grid-background opacity-10"></div>
 
       {/* Navigation Bar */}
       <nav className="relative z-10 flex justify-between items-center p-4 md:p-6 border-b border-green-500/20 bg-gray-900/80 backdrop-blur-sm">
