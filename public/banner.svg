@@ -1,0 +1,79 @@
+<svg width="1500" height="500" viewBox="0 0 1500 500" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background with gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#0a0a0a;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#0f1f0f;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0a0a0a;stop-opacity:1" />
+    </linearGradient>
+    
+    <radialGradient id="spotGlow" cx="50%" cy="50%">
+      <stop offset="0%" style="stop-color:#00ff00;stop-opacity:0.2" />
+      <stop offset="100%" style="stop-color:#00ff00;stop-opacity:0" />
+    </radialGradient>
+    
+    <filter id="textGlow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <filter id="snakeGlow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1500" height="500" fill="url(#bgGradient)"/>
+  
+  <!-- Glow spots -->
+  <circle cx="300" cy="250" r="200" fill="url(#spotGlow)"/>
+  <circle cx="1200" cy="250" r="200" fill="url(#spotGlow)"/>
+  
+  <!-- Grid pattern -->
+  <g opacity="0.1">
+    <line x1="0" y1="100" x2="1500" y2="100" stroke="#00ff00" stroke-width="1"/>
+    <line x1="0" y1="200" x2="1500" y2="200" stroke="#00ff00" stroke-width="1"/>
+    <line x1="0" y1="300" x2="1500" y2="300" stroke="#00ff00" stroke-width="1"/>
+    <line x1="0" y1="400" x2="1500" y2="400" stroke="#00ff00" stroke-width="1"/>
+  </g>
+  
+  <!-- Left snake -->
+  <g filter="url(#snakeGlow)">
+    <path d="M 50 250 Q 150 200 250 250 Q 300 280 280 320" 
+          fill="none" stroke="#00ff00" stroke-width="25" stroke-linecap="round"/>
+    <circle cx="280" cy="320" r="18" fill="#00ff00"/>
+    <circle cx="276" cy="316" r="3" fill="#0a0a0a"/>
+    <circle cx="284" cy="316" r="3" fill="#0a0a0a"/>
+  </g>
+  
+  <!-- Right snake -->
+  <g filter="url(#snakeGlow)">
+    <path d="M 1450 250 Q 1350 200 1250 250 Q 1200 280 1220 320" 
+          fill="none" stroke="#00ff00" stroke-width="25" stroke-linecap="round"/>
+    <circle cx="1220" cy="320" r="18" fill="#00ff00"/>
+    <circle cx="1216" cy="316" r="3" fill="#0a0a0a"/>
+    <circle cx="1224" cy="316" r="3" fill="#0a0a0a"/>
+  </g>
+  
+  <!-- Main title -->
+  <g filter="url(#textGlow)">
+    <text x="750" y="280" font-family="Arial, sans-serif" font-size="160" font-weight="bold" 
+          fill="#00ff00" text-anchor="middle" letter-spacing="10">
+      SLITHER.WORLD
+    </text>
+  </g>
+  
+  <!-- Decorative pellets -->
+  <circle cx="400" cy="150" r="8" fill="#ffffff" opacity="0.6"/>
+  <circle cx="1100" cy="150" r="8" fill="#ffffff" opacity="0.6"/>
+  <circle cx="500" cy="400" r="6" fill="#ffffff" opacity="0.4"/>
+  <circle cx="1000" cy="400" r="6" fill="#ffffff" opacity="0.4"/>
+</svg>
