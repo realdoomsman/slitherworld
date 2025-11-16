@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: slither-game-server
+    env: docker
+    region: oregon
+    plan: starter
+    dockerfilePath: ./Dockerfile.render
+    dockerContext: .
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+      - key: DATABASE_URL
+        sync: false
+      - key: UPSTASH_REDIS_REST_URL
+        sync: false
+      - key: UPSTASH_REDIS_REST_TOKEN
+        sync: false
+      - key: SOLANA_TREASURY_PRIVATE_KEY
+        sync: false
+      - key: NEXT_PUBLIC_SOLANA_RPC
+        value: https://api.mainnet-beta.solana.com
