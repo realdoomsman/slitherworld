@@ -171,11 +171,11 @@ export default function Home() {
           <p className="text-xs text-gray-500 mb-2 text-center">Treasury Contract</p>
           <div className="flex items-center justify-center gap-2">
             <code className="text-xs text-green-400 font-mono">
-              GpWkVYPmc5rRFRXCRhdHH2zcSYExy19vwYeeG8GunVF7
+              98cTHUmkwPBj64dus3Uvmjwb5XkdHc1kSdoNrzPQZQgb
             </code>
             <button
               onClick={() => {
-                navigator.clipboard.writeText('GpWkVYPmc5rRFRXCRhdHH2zcSYExy19vwYeeG8GunVF7')
+                navigator.clipboard.writeText('98cTHUmkwPBj64dus3Uvmjwb5XkdHc1kSdoNrzPQZQgb')
                 alert('Copied!')
               }}
               className="text-xs text-gray-400 hover:text-green-400 transition-colors"

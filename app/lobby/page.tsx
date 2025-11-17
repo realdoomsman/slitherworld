@@ -3,7 +3,7 @@
 import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 
-const TREASURY_ADDRESS = 'GpWkVYPmc5rRFRXCRhdHH2zcSYExy19vwYeeG8GunVF7'
+const TREASURY_ADDRESS = '98cTHUmkwPBj64dus3Uvmjwb5XkdHc1kSdoNrzPQZQgb'
 
 const LOBBY_INFO: Record<string, { name: string; fee: number; players: number }> = {
   FREE: { name: 'Free Play', fee: 0, players: 5 },
