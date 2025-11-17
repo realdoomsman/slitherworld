@@ -1,6 +1,5 @@
 import { LobbyConfig, LOBBY_TYPES } from '../../shared/types'
 import { GameInstance } from './GameInstance'
-import { BotPlayer } from './BotPlayer'
 import { v4 as uuidv4 } from 'uuid'
 
 export class LobbyManager {
@@ -8,7 +7,7 @@ export class LobbyManager {
   private games: Map<string, GameInstance> = new Map()
   private playerToLobby: Map<string, string> = new Map()
   private playerToWallet: Map<string, string> = new Map()
-  private bots: Map<string, BotPlayer> = new Map()
+  private playerToNickname: Map<string, string> = new Map()
   private onGameEnd: (lobbyId: string, winnerId: string, stats: Map<string, any>) => void
   private onKill?: (lobbyId: string, killerId: string, victimId: string) => void
 
@@ -24,28 +23,8 @@ export class LobbyManager {
     return this.playerToWallet.get(playerId)
   }
 
-  public addBotsToLobby(lobbyId: string, count: number): void {
-    const lobby = this.lobbies.get(lobbyId)
-    if (!lobby || lobby.status !== 'waiting') return
-
-    for (let i = 0; i < count; i++) {
-      if (lobby.players.length >= lobby.maxPlayers) break
-      
-      const botId = `bot_${uuidv4()}`
-      const bot = new BotPlayer(botId)
-      this.bots.set(botId, bot)
-      
-      lobby.players.push(botId)
-      this.playerToLobby.set(botId, lobbyId)
-    }
-
-    // Check if we can start now
-    const devMode = process.env.DEV_MODE === 'true'
-    const minRequired = devMode ? 1 : lobby.minPlayers
-
-    if (lobby.players.length >= minRequired) {
-      setTimeout(() => this.startLobby(lobbyId), 1000)
-    }
+  public getPlayerNickname(playerId: string): string | undefined {
+    return this.playerToNickname.get(playerId)
   }
 
   public createLobby(type: keyof typeof LOBBY_TYPES): LobbyConfig {
@@ -63,7 +42,7 @@ export class LobbyManager {
     return lobby
   }
 
-  public joinLobby(lobbyId: string, playerId: string, walletAddress: string): boolean {
+  public joinLobby(lobbyId: string, playerId: string, walletAddress: string, nickname?: string): boolean {
     const lobby = this.lobbies.get(lobbyId)
     if (!lobby) return false
     if (lobby.status !== 'waiting') return false
@@ -73,14 +52,13 @@ export class LobbyManager {
     lobby.players.push(playerId)
     this.playerToLobby.set(playerId, lobbyId)
     this.playerToWallet.set(playerId, walletAddress)
-
-    // Dev mode: start with 1 player for testing
-    const devMode = process.env.DEV_MODE === 'true'
-    const minRequired = devMode ? 1 : lobby.minPlayers
+    if (nickname) {
+      this.playerToNickname.set(playerId, nickname)
+    }
 
     // Auto-start if minimum players reached
-    if (lobby.players.length >= minRequired) {
-      setTimeout(() => this.startLobby(lobbyId), devMode ? 1000 : 3000)
+    if (lobby.players.length >= lobby.minPlayers) {
+      setTimeout(() => this.startLobby(lobbyId), 3000)
     }
 
     return true
@@ -101,13 +79,9 @@ export class LobbyManager {
     const lobby = this.lobbies.get(lobbyId)
     if (!lobby || lobby.status !== 'waiting') return
     
-    // Dev mode: allow starting with 1 player
-    const devMode = process.env.DEV_MODE === 'true'
-    const minRequired = devMode ? 1 : lobby.minPlayers
+    console.log(`Starting lobby ${lobbyId}: ${lobby.players.length}/${lobby.minPlayers} players`)
     
-    console.log(`Starting lobby ${lobbyId}: ${lobby.players.length}/${minRequired} players (dev: ${devMode})`)
-    
-    if (lobby.players.length < minRequired) return
+    if (lobby.players.length < lobby.minPlayers) return
 
     lobby.status = 'active'
     console.log(`Lobby ${lobbyId} now active, creating game instance`)
@@ -115,7 +89,7 @@ export class LobbyManager {
     // Create game instance
     const players = lobby.players.map(id => ({
       id,
-      walletAddress: id, // In real implementation, map to wallet
+      walletAddress: this.playerToWallet.get(id) || id,
     }))
 
     const game = new GameInstance(

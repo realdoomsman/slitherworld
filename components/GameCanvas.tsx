@@ -6,13 +6,16 @@ import MobileControls from './MobileControls'
 
 interface GameCanvasProps {
   lobbyId: string
+  nickname: string
+  walletAddress: string
 }
 
-export default function GameCanvas({ lobbyId }: GameCanvasProps) {
+export default function GameCanvas({ lobbyId, nickname, walletAddress }: GameCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const socketRef = useRef<Socket | null>(null)
   const [gameState, setGameState] = useState<any>(null)
   const [mySnakeId, setMySnakeId] = useState<string | null>(null)
+  const [myNickname] = useState<string>(nickname)
   const [gameOver, setGameOver] = useState<{ winner: string; payout: number } | null>(null)
   const [isDead, setIsDead] = useState(false)
   const [killFeed, setKillFeed] = useState<Array<{ killer: string; victim: string; time: number }>>([])
@@ -20,7 +23,6 @@ export default function GameCanvas({ lobbyId }: GameCanvasProps) {
   const cameraRef = useRef({ x: 0, y: 0 })
 
   useEffect(() => {
-    const token = localStorage.getItem('sessionToken')
     const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL!, {
       transports: ['websocket'],
     })
@@ -29,13 +31,19 @@ export default function GameCanvas({ lobbyId }: GameCanvasProps) {
 
     socket.on('connect', () => {
       console.log('Socket connected, authenticating...')
-      socket.emit('authenticate', { token })
+      socket.emit('authenticate', { 
+        nickname,
+        walletAddress 
+      })
     })
 
     socket.on('authenticated', (data: any) => {
       console.log('Authenticated, joining lobby:', lobbyId)
       setMySnakeId(socket.id || null)
-      socket.emit('join_lobby', { lobbyId })
+      socket.emit('join_lobby', { 
+        lobbyId,
+        nickname 
+      })
     })
 
     socket.on('game_state', (state: any) => {

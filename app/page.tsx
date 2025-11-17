@@ -7,105 +7,37 @@ import { useRouter } from 'next/navigation'
 import bs58 from 'bs58'
 
 export default function Home() {
-  const { publicKey, signMessage, disconnect } = useWallet()
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [sessionToken, setSessionToken] = useState<string | null>(null)
-  const [mounted, setMounted] = useState(false)
-  const [isAuthenticating, setIsAuthenticating] = useState(false)
   const router = useRouter()
+  const [mounted, setMounted] = useState(false)
+  const [nickname, setNickname] = useState('')
 
   useEffect(() => {
     setMounted(true)
-    const token = localStorage.getItem('sessionToken')
-    if (token && publicKey) {
-      setSessionToken(token)
-      setIsAuthenticated(true)
+    const savedNickname = localStorage.getItem('playerNickname')
+    if (savedNickname) {
+      setNickname(savedNickname)
     }
-  }, [publicKey])
+  }, [])
 
-  // Reset auth when wallet disconnects
-  useEffect(() => {
-    if (!publicKey) {
-      setIsAuthenticated(false)
-      setSessionToken(null)
-      localStorage.removeItem('sessionToken')
+  const handleJoinLobby = (type: string) => {
+    if (!nickname.trim()) {
+      alert('Please enter a nickname first!')
+      return
     }
-  }, [publicKey])
-
-  const handleAuthenticate = async () => {
-    if (!publicKey || !signMessage || isAuthenticating) return
-
-    setIsAuthenticating(true)
-    try {
-      console.log('Starting authentication for:', publicKey.toString())
-      
-      // Get challenge
-      const challengeRes = await fetch('/api/auth/challenge', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ walletAddress: publicKey.toString() }),
-      })
-      const { message } = await challengeRes.json()
-      console.log('Got challenge:', message)
-
-      // Sign message
-      const messageBytes = new TextEncoder().encode(message)
-      const signature = await signMessage(messageBytes)
-      const signatureBase58 = bs58.encode(signature)
-      console.log('Signed message')
-
-      // Verify signature
-      const verifyRes = await fetch('/api/auth/verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          walletAddress: publicKey.toString(),
-          signature: signatureBase58,
-          message,
-        }),
-      })
-
-      const verifyData = await verifyRes.json()
-      console.log('Verify response:', verifyData)
-      
-      if (verifyData.error) {
-        alert('Authentication failed: ' + verifyData.error)
-        setIsAuthenticating(false)
-        return
-      }
-
-      const { token } = verifyData
-      localStorage.setItem('sessionToken', token)
-      setSessionToken(token)
-      setIsAuthenticated(true)
-      console.log('Authentication successful!')
-    } catch (error) {
-      console.error('Authentication error:', error)
-      alert('Authentication failed. Please try again.')
-    } finally {
-      setIsAuthenticating(false)
+    if (nickname.trim().length < 2 || nickname.trim().length > 20) {
+      alert('Nickname must be 2-20 characters!')
+      return
     }
-  }
-
-  const handleDisconnect = async () => {
-    await disconnect()
-    setIsAuthenticated(false)
-    setSessionToken(null)
-    localStorage.removeItem('sessionToken')
+    localStorage.setItem('playerNickname', nickname.trim())
+    router.push(`/lobby?type=${type}`)
   }
 
   const lobbyTypes = [
-    { name: 'Free Play', fee: 0, type: 'FREE', prize: 0.05 },
-    { name: 'Micro', fee: 0.05, type: 'MICRO' },
-    { name: 'Small', fee: 0.25, type: 'SMALL' },
-    { name: 'Medium', fee: 0.5, type: 'MEDIUM' },
-    { name: 'Large', fee: 1, type: 'LARGE' },
-    { name: 'Whale', fee: 5, type: 'WHALE' },
+    { name: 'Free Play', fee: 0, type: 'FREE', prize: 0.05, players: 5 },
+    { name: 'Paid Game', fee: 0.25, type: 'PAID', players: 10 },
   ]
 
-  const handleJoinLobby = (type: string) => {
-    router.push(`/lobby?type=${type}`)
-  }
+
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-black">
@@ -122,24 +54,9 @@ export default function Home() {
           <a href="/" className="text-gray-300 hover:text-green-400 transition-colors">Play</a>
           <a href="/leaderboard" className="text-gray-300 hover:text-green-400 transition-colors">Leaderboard</a>
           <a href="/live" className="text-gray-300 hover:text-purple-400 transition-colors">Watch Live</a>
-          {isAuthenticated && (
-            <a href="/profile" className="text-gray-300 hover:text-green-400 transition-colors">Profile</a>
-          )}
         </div>
         <div className="flex items-center gap-3">
-          {mounted && (
-            <>
-              <WalletMultiButton className="!bg-green-600 hover:!bg-green-700 !rounded-lg !px-4 !py-2 !font-semibold !text-sm !transition-colors" />
-              {publicKey && isAuthenticated && (
-                <button
-                  onClick={handleDisconnect}
-                  className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg font-semibold text-sm transition-colors"
-                >
-                  Disconnect
-                </button>
-              )}
-            </>
-          )}
+          {/* No wallet needed */}
         </div>
       </nav>
 
@@ -166,161 +83,100 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Auth Flow */}
-        {!mounted ? (
-          <div className="h-12"></div>
-        ) : !publicKey ? (
-          <div className="text-center mb-12">
-            <p className="text-gray-300 mb-4">Connect your wallet to start playing</p>
-            <WalletMultiButton className="!bg-green-600 hover:!bg-green-700 !rounded-lg !px-8 !py-3 !font-bold !text-lg" />
+        {/* Nickname Input */}
+        <div className="w-full max-w-md mb-12">
+          <div className="bg-gray-900/90 p-6 rounded-2xl border-2 border-green-500/30">
+            <h3 className="text-xl font-bold text-center mb-4 text-green-400">Enter Nickname</h3>
+            <input
+              type="text"
+              value={nickname}
+              onChange={(e) => setNickname(e.target.value)}
+              placeholder="Your nickname..."
+              maxLength={20}
+              className="w-full px-4 py-3 bg-black/50 border-2 border-green-500/30 rounded-xl text-white text-center focus:outline-none focus:border-green-500 transition-colors"
+            />
+            <p className="text-xs text-gray-500 text-center mt-2">2-20 characters</p>
           </div>
-        ) : !isAuthenticated ? (
-          <div className="text-center mb-12">
-            <p className="text-gray-300 mb-4">Sign a message to authenticate</p>
-            <button
-              onClick={handleAuthenticate}
-              disabled={isAuthenticating}
-              className="px-8 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 rounded-lg font-bold text-lg transition-colors"
-            >
-              {isAuthenticating ? 'Signing...' : 'Sign Message'}
-            </button>
-          </div>
-        ) : null}
-
-        {/* Quick Actions */}
-        {!isAuthenticated && (
-          <div className="flex gap-4 mb-12">
-            <a
-              href="/live"
-              className="px-6 py-2 bg-green-600/20 hover:bg-green-600/30 border border-green-500/50 rounded-lg font-semibold transition-colors text-green-400"
-            >
-              Watch Live
-            </a>
-            <a
-              href="/leaderboard"
-              className="px-6 py-2 bg-green-600/20 hover:bg-green-600/30 border border-green-500/50 rounded-lg font-semibold transition-colors text-green-400"
-            >
-              Leaderboard
-            </a>
-          </div>
-        )}
+        </div>
 
         {/* Game Modes */}
-        {isAuthenticated && (
-          <div className="w-full max-w-5xl">
-            <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">Select Game Mode</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {lobbyTypes.map((lobby) => (
-                <button
-                  key={lobby.type}
-                  onClick={() => handleJoinLobby(lobby.type)}
-                  className={`${
-                    lobby.type === 'WHALE' 
-                      ? 'bg-gradient-to-br from-green-600 to-emerald-700 md:col-span-2 lg:col-span-3 border-2 border-green-400 shadow-lg shadow-green-500/50' 
-                      : lobby.fee === 0
-                      ? 'bg-gradient-to-br from-green-600/80 to-emerald-600/80 border border-green-500/50 shadow-md shadow-green-500/30'
-                      : 'bg-gradient-to-br from-gray-800 to-gray-900 border border-green-500/30 hover:shadow-md hover:shadow-green-500/20'
-                  } p-6 rounded-xl hover:scale-105 hover:border-green-400 transition-all text-left relative overflow-hidden group`}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-green-500/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
-                  <div className="flex justify-between items-start mb-3 relative z-10">
-                    <div>
-                      <h3 className="text-xl font-bold mb-1 text-white">
-                        {lobby.name}
-                      </h3>
-                      {lobby.fee === 0 ? (
-                        <p className="text-3xl font-bold text-white">FREE</p>
-                      ) : (
-                        <p className="text-3xl font-bold text-white">{lobby.fee} SOL</p>
-                      )}
-                    </div>
-                    {lobby.type === 'WHALE' && (
-                      <span className="px-2 py-1 bg-green-500 text-black rounded text-xs font-bold">
-                        WHALE
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="space-y-1 text-sm text-gray-200">
-                    {lobby.prize ? (
-                      <div className="flex justify-between">
-                        <span>Prize Pool</span>
-                        <span className="font-bold">{lobby.prize} SOL</span>
-                      </div>
+        <div className="w-full max-w-5xl">
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">Select Game Mode</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {lobbyTypes.map((lobby) => (
+              <button
+                key={lobby.type}
+                onClick={() => handleJoinLobby(lobby.type)}
+                disabled={!nickname.trim()}
+                className={`${
+                  lobby.fee === 0
+                    ? 'bg-gradient-to-br from-green-600/80 to-emerald-600/80 border border-green-500/50 shadow-md shadow-green-500/30'
+                    : 'bg-gradient-to-br from-gray-800 to-gray-900 border border-green-500/30 hover:shadow-md hover:shadow-green-500/20'
+                } p-6 rounded-xl hover:scale-105 hover:border-green-400 transition-all text-left relative overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100`}
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-green-500/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+                <div className="flex justify-between items-start mb-3 relative z-10">
+                  <div>
+                    <h3 className="text-xl font-bold mb-1 text-white">
+                      {lobby.name}
+                    </h3>
+                    {lobby.fee === 0 ? (
+                      <p className="text-3xl font-bold text-white">FREE</p>
                     ) : (
-                      <div className="flex justify-between">
-                        <span>Winner Takes</span>
-                        <span className="font-bold">80%</span>
-                      </div>
+                      <p className="text-3xl font-bold text-white">{lobby.fee} SOL</p>
                     )}
                   </div>
-                </button>
-              ))}
-            </div>
+                </div>
+
+                <div className="space-y-1 text-sm text-gray-200">
+                  <div className="flex justify-between">
+                    <span>Players</span>
+                    <span className="font-bold">{lobby.players}</span>
+                  </div>
+                  {lobby.prize ? (
+                    <div className="flex justify-between">
+                      <span>Winner Gets</span>
+                      <span className="font-bold text-yellow-400">{lobby.prize} SOL</span>
+                    </div>
+                  ) : (
+                    <div className="flex justify-between">
+                      <span>Winner Takes</span>
+                      <span className="font-bold">80%</span>
+                    </div>
+                  )}
+                </div>
+              </button>
+            ))}
           </div>
-        )}
+        </div>
 
         {/* How to Play */}
-        {!isAuthenticated && (
-          <div className="w-full max-w-4xl mt-16 px-4">
-            <h2 className="text-3xl font-bold text-center mb-8 bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">How It Works</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-              <div className="p-6 bg-gray-900/50 rounded-lg border border-green-500/20 hover:border-green-500/50 hover:bg-gray-900/70 transition-all hover:scale-105">
-                <div className="w-12 h-12 rounded-full bg-green-500/20 border-2 border-green-500 flex items-center justify-center mb-4 mx-auto">
-                  <span className="text-green-400 font-bold">1</span>
-                </div>
-                <h3 className="text-lg font-bold mb-2 text-white text-center">Connect Wallet</h3>
-                <p className="text-sm text-gray-400 text-center">Connect your Solana wallet and sign to authenticate</p>
+        <div className="w-full max-w-4xl mt-16 px-4">
+          <h2 className="text-3xl font-bold text-center mb-8 bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">How It Works</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div className="p-6 bg-gray-900/50 rounded-lg border border-green-500/20 hover:border-green-500/50 hover:bg-gray-900/70 transition-all hover:scale-105">
+              <div className="w-12 h-12 rounded-full bg-green-500/20 border-2 border-green-500 flex items-center justify-center mb-4 mx-auto">
+                <span className="text-green-400 font-bold">1</span>
               </div>
-              <div className="p-6 bg-gray-900/50 rounded-lg border border-green-500/20">
-                <div className="w-12 h-12 rounded-full bg-green-500/20 border-2 border-green-500 flex items-center justify-center mb-4 mx-auto">
-                  <span className="text-green-400 font-bold">2</span>
-                </div>
-                <h3 className="text-lg font-bold mb-2 text-white text-center">Choose Lobby</h3>
-                <p className="text-sm text-gray-400 text-center">Select free or paid lobby, entry fee goes to pot</p>
-              </div>
-              <div className="p-6 bg-gray-900/50 rounded-lg border border-green-500/20">
-                <div className="w-12 h-12 rounded-full bg-green-500/20 border-2 border-green-500 flex items-center justify-center mb-4 mx-auto">
-                  <span className="text-green-400 font-bold">3</span>
-                </div>
-                <h3 className="text-lg font-bold mb-2 text-white text-center">Win & Earn</h3>
-                <p className="text-sm text-gray-400 text-center">Last snake alive wins 80% of the pot instantly</p>
-              </div>
+              <h3 className="text-lg font-bold mb-2 text-white text-center">Enter Nickname</h3>
+              <p className="text-sm text-gray-400 text-center">Choose your player name (2-20 characters)</p>
             </div>
-
-            {/* Token Info */}
-            <div className="p-6 bg-gradient-to-br from-gray-900/80 to-gray-900/50 rounded-lg border border-green-500/30 shadow-lg shadow-green-500/10 hover:shadow-green-500/20 transition-all">
-              <h3 className="text-xl font-bold mb-4 bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent text-center">Token Contract</h3>
-              <div className="flex items-center justify-center gap-3">
-                <code className="px-4 py-2 bg-black/50 rounded text-green-400 text-sm font-mono">
-                  Coming Soon
-                </code>
-                <button className="px-4 py-2 bg-green-600/20 hover:bg-green-600/30 border border-green-500/50 rounded text-green-400 text-sm font-semibold transition-colors">
-                  Copy
-                </button>
+            <div className="p-6 bg-gray-900/50 rounded-lg border border-green-500/20">
+              <div className="w-12 h-12 rounded-full bg-green-500/20 border-2 border-green-500 flex items-center justify-center mb-4 mx-auto">
+                <span className="text-green-400 font-bold">2</span>
               </div>
-              <p className="text-xs text-gray-500 text-center mt-3">15% of each pot goes to automatic token buybacks</p>
+              <h3 className="text-lg font-bold mb-2 text-white text-center">Send Payment</h3>
+              <p className="text-sm text-gray-400 text-center">Send SOL to our wallet with your lobby ID</p>
+            </div>
+            <div className="p-6 bg-gray-900/50 rounded-lg border border-green-500/20">
+              <div className="w-12 h-12 rounded-full bg-green-500/20 border-2 border-green-500 flex items-center justify-center mb-4 mx-auto">
+                <span className="text-green-400 font-bold">3</span>
+              </div>
+              <h3 className="text-lg font-bold mb-2 text-white text-center">Win & Earn</h3>
+              <p className="text-sm text-gray-400 text-center">Last snake alive wins 80% of the pot!</p>
             </div>
           </div>
-        )}
-
-        {/* Demo Mode */}
-        {!isAuthenticated && (
-          <div className="w-full max-w-4xl mt-12 px-4">
-            <div className="p-8 bg-gradient-to-br from-green-900/20 to-emerald-900/20 rounded-xl border border-green-500/30">
-              <h3 className="text-2xl font-bold text-center mb-4 text-green-400">Try Demo Mode</h3>
-              <p className="text-center text-gray-400 mb-6">Play instantly without connecting a wallet - no waiting, no fees</p>
-              <div className="flex justify-center">
-                <a
-                  href="/game?demo=true"
-                  className="px-8 py-4 bg-green-600 hover:bg-green-700 rounded-lg font-bold text-lg transition-all hover:scale-105 shadow-lg shadow-green-500/30"
-                >
-                  Play Demo Now
-                </a>
-              </div>
-            </div>
-          </div>
-        )}
+        </div>
       </div>
 
       {/* Footer */}

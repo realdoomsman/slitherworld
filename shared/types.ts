@@ -65,10 +65,6 @@ export interface LobbyConfig {
 }
 
 export const LOBBY_TYPES = {
-  FREE: { entryFee: 0, minPlayers: 10, maxPlayers: 20, winnerPrize: 0.05 },
-  MICRO: { entryFee: 0.05, minPlayers: 15, maxPlayers: 25 },
-  SMALL: { entryFee: 0.25, minPlayers: 15, maxPlayers: 25 },
-  MEDIUM: { entryFee: 0.5, minPlayers: 15, maxPlayers: 25 },
-  LARGE: { entryFee: 1, minPlayers: 15, maxPlayers: 25 },
-  WHALE: { entryFee: 5, minPlayers: 30, maxPlayers: 50 },
+  FREE: { entryFee: 0, minPlayers: 5, maxPlayers: 5, winnerPrize: 0.05 },
+  PAID: { entryFee: 0.25, minPlayers: 10, maxPlayers: 10 },
 }

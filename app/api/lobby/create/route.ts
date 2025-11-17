@@ -1,68 +1,46 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { validateSession } from '@/server/solana/auth'
-import { generatePaymentInstruction } from '@/server/solana/payments'
+import { v4 as uuidv4 } from 'uuid'
 import { db } from '@/server/db'
 import { matches } from '@/server/db/schema'
-import { LOBBY_TYPES } from '@/shared/types'
-import { rateLimit, RATE_LIMITS } from '@/lib/rateLimit'
-import { checkActiveGame } from '@/server/utils/redis'
 
 export async function POST(request: NextRequest) {
   try {
-    const token = request.headers.get('authorization')?.replace('Bearer ', '')
-    if (!token) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const { lobbyType, nickname, walletAddress } = await request.json()
+
+    if (!nickname || nickname.trim().length < 2) {
+      return NextResponse.json({ error: 'Invalid nickname' }, { status: 400 })
     }
 
-    const wallet = await validateSession(token)
-    if (!wallet) {
-      return NextResponse.json({ error: 'Invalid session' }, { status: 401 })
+    if (!walletAddress || walletAddress.trim().length < 32) {
+      return NextResponse.json({ error: 'Invalid wallet address' }, { status: 400 })
     }
 
-    // Rate limiting per wallet
-    if (!rateLimit(`lobby:${wallet}`, RATE_LIMITS.LOBBY_CREATE)) {
-      return NextResponse.json(
-        { error: 'Too many lobby creation attempts. Please wait a moment.' },
-        { status: 429 }
-      )
-    }
-
-    // Check if player already in a game
-    const hasActiveGame = await checkActiveGame(wallet)
-    if (hasActiveGame) {
-      return NextResponse.json(
-        { error: 'You are already in an active game' },
-        { status: 400 }
-      )
-    }
-
-    const { lobbyType } = await request.json()
-    
-    if (!LOBBY_TYPES[lobbyType as keyof typeof LOBBY_TYPES]) {
+    if (lobbyType !== 'FREE' && lobbyType !== 'PAID') {
       return NextResponse.json({ error: 'Invalid lobby type' }, { status: 400 })
     }
 
-    const config = LOBBY_TYPES[lobbyType as keyof typeof LOBBY_TYPES]
-    
-    // Create match record
-    const matchId = crypto.randomUUID()
+    const lobbyId = uuidv4()
+    const entryFee = lobbyType === 'FREE' ? '0' : '0.25'
+
+    // Create match in database
     await db.insert(matches).values({
-      id: matchId,
+      id: lobbyId,
       lobbyType,
-      entryFee: config.entryFee.toString(),
+      entryFee,
       potAmount: '0',
-      startedAt: new Date(),
       status: 'waiting',
+      startedAt: new Date(),
     })
 
-    // Generate payment instruction (HTTP 402)
-    const paymentInstruction = generatePaymentInstruction(config.entryFee)
-
     return NextResponse.json({
-      lobbyId: matchId,
-      payment: paymentInstruction,
-    }, { status: 402 })
+      lobbyId,
+      lobbyType,
+      entryFee: parseFloat(entryFee),
+      nickname: nickname.trim(),
+      walletAddress: walletAddress.trim(),
+    })
   } catch (error) {
+    console.error('Lobby creation error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

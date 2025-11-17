@@ -1,32 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { validateSession } from '@/server/solana/auth'
 import { db } from '@/server/db'
 import { matchPlayers } from '@/server/db/schema'
 
 export async function POST(request: NextRequest) {
   try {
-    const token = request.headers.get('authorization')?.replace('Bearer ', '')
-    if (!token) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const { lobbyId, walletAddress } = await request.json()
+
+    if (!lobbyId || !walletAddress) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    const wallet = await validateSession(token)
-    if (!wallet) {
-      return NextResponse.json({ error: 'Invalid session' }, { status: 401 })
-    }
-
-    const { lobbyId } = await request.json()
-
-    // Add player to free match
+    // Create match_players entry for free lobby
     await db.insert(matchPlayers).values({
       matchId: lobbyId,
-      walletAddress: wallet,
+      walletAddress: walletAddress.trim(),
       entryTxHash: 'FREE_ENTRY',
     })
 
-    return NextResponse.json({ success: true, lobbyId })
+    return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('Free lobby join error:', error)
+    console.error('Join free lobby error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

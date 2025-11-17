@@ -44,20 +44,24 @@ io.on('connection', (socket) => {
   let authenticatedWallet: string | null = null
   let currentLobby: string | null = null
 
-  socket.on('authenticate', async (data: { token: string }) => {
-    console.log('Authenticate request received')
-    const wallet = await validateSession(data.token)
-    if (wallet) {
-      authenticatedWallet = wallet
-      console.log(`Authenticated wallet: ${wallet}`)
-      socket.emit('authenticated', { wallet })
+  socket.on('authenticate', async (data: { nickname?: string; walletAddress?: string }) => {
+    console.log('Authenticate request received', data)
+    
+    // New system: just store nickname and wallet
+    if (data.nickname && data.walletAddress) {
+      authenticatedWallet = data.walletAddress
+      console.log(`Player authenticated: ${data.nickname} (${data.walletAddress.slice(0, 8)}...)`)
+      socket.emit('authenticated', { 
+        wallet: data.walletAddress,
+        nickname: data.nickname 
+      })
     } else {
-      console.log('Authentication failed')
-      socket.emit('auth_error', { message: 'Invalid session' })
+      console.log('Authentication failed - missing nickname or wallet')
+      socket.emit('auth_error', { message: 'Nickname and wallet required' })
     }
   })
 
-  socket.on('join_lobby', async (data: { lobbyId: string; spectate?: boolean }) => {
+  socket.on('join_lobby', async (data: { lobbyId: string; spectate?: boolean; nickname?: string }) => {
     console.log(`${data.spectate ? 'Spectator' : 'Player'} ${socket.id} joining lobby ${data.lobbyId}`)
     
     // Spectator mode - no authentication required
@@ -103,7 +107,7 @@ io.on('connection', (socket) => {
       }
     }
     
-    const success = lobbyManager.joinLobby(data.lobbyId, socket.id, authenticatedWallet)
+    const success = lobbyManager.joinLobby(data.lobbyId, socket.id, authenticatedWallet, data.nickname)
     if (success) {
       currentLobby = data.lobbyId
       socket.join(data.lobbyId)
