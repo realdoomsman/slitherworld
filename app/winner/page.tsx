@@ -94,7 +94,7 @@ function WinnerContent() {
           <div className="text-center mb-6">
             <p className="text-gray-400 text-lg mb-2">Champion</p>
             <h2 className="text-5xl font-bold text-yellow-400 mb-4">
-              {matchData.winner.nickname || 'Anonymous'}
+              Winner
             </h2>
             <div className="inline-block bg-yellow-500/20 border-2 border-yellow-500 rounded-xl px-6 py-3">
               <p className="text-sm text-gray-400 mb-1">Prize Won</p>

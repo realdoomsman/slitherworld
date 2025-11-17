@@ -29,8 +29,8 @@ export async function GET(
       .from(matchPlayers)
       .where(eq(matchPlayers.matchId, matchId))
 
-    // Find winner
-    const winner = players.find(p => p.playerId === match.winnerId)
+    // Find winner by wallet address
+    const winner = players.find(p => p.walletAddress === match.winnerAddress)
 
     if (!winner) {
       return NextResponse.json({ error: 'Winner not found' }, { status: 404 })
@@ -50,10 +50,8 @@ export async function GET(
       lobbyType: match.lobbyType,
       status: match.status,
       winner: {
-        playerId: winner.playerId,
-        nickname: winner.nickname,
         walletAddress: winner.walletAddress,
-        kills: winner.kills || 0,
+        kills: winner.killCount || 0,
         length: winner.finalLength || 0,
       },
       winnerPayout: parseFloat(match.winnerPayout || '0'),
