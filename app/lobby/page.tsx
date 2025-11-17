@@ -52,6 +52,13 @@ function LobbyContent() {
 
       const data = await res.json()
       
+      if (data.gameInProgress) {
+        // Show game in progress screen
+        setStatus('error')
+        setErrorMessage(data.message || 'A game is currently running. Please wait.')
+        return
+      }
+      
       if (data.error) {
         setErrorMessage(data.error)
         setStatus('error')
@@ -203,12 +210,42 @@ function LobbyContent() {
       </nav>
 
       <div className="max-w-2xl mx-auto p-4 md:p-8">
+        {/* Game in Progress Screen */}
+        {status === 'error' && errorMessage.includes('running') && (
+          <div className="bg-gradient-to-br from-gray-900 to-black border-2 border-yellow-500/30 rounded-2xl p-6 md:p-8 text-center">
+            <div className="text-6xl md:text-8xl mb-4">⏳</div>
+            <h2 className="text-3xl md:text-4xl font-bold text-yellow-400 mb-4">Game in Progress</h2>
+            <p className="text-lg md:text-xl text-gray-300 mb-6">
+              A {lobbyInfo.name} game is currently running
+            </p>
+            <p className="text-base text-gray-400 mb-8">
+              Please wait for the current game to finish before joining a new one.
+            </p>
+            <div className="flex flex-col md:flex-row gap-3 justify-center">
+              <button
+                onClick={() => router.push('/')}
+                className="px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 rounded-xl font-bold transition-all"
+              >
+                Back to Home
+              </button>
+              <button
+                onClick={() => window.location.reload()}
+                className="px-6 py-3 bg-gray-800 hover:bg-gray-700 border-2 border-gray-700 rounded-xl font-bold transition-all"
+              >
+                Refresh
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Header */}
-        <div className="text-center mb-6 md:mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-green-400 mb-2">{lobbyInfo.name} Lobby</h1>
-          {lobbyId && <p className="text-sm md:text-base text-gray-400">Lobby ID: {lobbyId.slice(0, 8)}...</p>}
-          <p className="text-sm md:text-base text-gray-400">Players: {lobbyInfo.players}</p>
-        </div>
+        {status !== 'error' && (
+          <div className="text-center mb-6 md:mb-8">
+            <h1 className="text-3xl md:text-4xl font-bold text-green-400 mb-2">{lobbyInfo.name} Lobby</h1>
+            {lobbyId && <p className="text-sm md:text-base text-gray-400">Lobby ID: {lobbyId.slice(0, 8)}...</p>}
+            <p className="text-sm md:text-base text-gray-400">Players: {lobbyInfo.players}</p>
+          </div>
+        )}
 
         {/* Setup: Enter Wallet Address */}
         {status === 'setup' && (

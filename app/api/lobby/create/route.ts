@@ -22,6 +22,26 @@ export async function POST(request: NextRequest) {
 
     const entryFee = lobbyType === 'FREE' ? '0' : '0.25'
 
+    // Check if there's an active game running
+    const activeGames = await db
+      .select()
+      .from(matches)
+      .where(
+        and(
+          eq(matches.lobbyType, lobbyType),
+          eq(matches.status, 'active')
+        )
+      )
+      .limit(1)
+
+    if (activeGames.length > 0) {
+      return NextResponse.json({ 
+        error: 'Game in progress',
+        gameInProgress: true,
+        message: 'A game is currently running. Please wait for it to finish.'
+      }, { status: 409 })
+    }
+
     // Find existing waiting lobby for this type
     const existingLobbies = await db
       .select()
