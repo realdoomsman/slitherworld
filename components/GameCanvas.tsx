@@ -19,6 +19,8 @@ export default function GameCanvas({ lobbyId, nickname, walletAddress }: GameCan
   const [gameOver, setGameOver] = useState<{ winner: string; payout: number } | null>(null)
   const [isDead, setIsDead] = useState(false)
   const [killFeed, setKillFeed] = useState<Array<{ killer: string; victim: string; time: number }>>([])
+  const [lobbyPlayers, setLobbyPlayers] = useState<Array<{ id: string; nickname: string }>>([])
+  const [lobbyInfo, setLobbyInfo] = useState<{ current: number; required: number } | null>(null)
   const inputRef = useRef({ angle: 0, boosting: false })
   const cameraRef = useRef({ x: 0, y: 0 })
 
@@ -43,6 +45,15 @@ export default function GameCanvas({ lobbyId, nickname, walletAddress }: GameCan
       socket.emit('join_lobby', { 
         lobbyId,
         nickname 
+      })
+    })
+
+    socket.on('lobby_update', (data: any) => {
+      console.log('Lobby update:', data)
+      setLobbyPlayers(data.players || [])
+      setLobbyInfo({
+        current: data.playerCount || 0,
+        required: data.requiredPlayers || 5
       })
     })
 
@@ -282,19 +293,86 @@ export default function GameCanvas({ lobbyId, nickname, walletAddress }: GameCan
     <div className="relative w-full h-screen bg-black">
       <canvas ref={canvasRef} className="w-full h-full" />
       
-      {/* Waiting Screen */}
+      {/* Waiting Room */}
       {!gameState && (
-        <div className="absolute inset-0 bg-black flex items-center justify-center">
-          <div className="text-center">
-            <div className="mb-8">
-              <div className="w-20 h-20 rounded-full bg-green-500/20 border-4 border-green-500 flex items-center justify-center mx-auto mb-6 animate-pulse">
-                <div className="w-10 h-10 rounded-full bg-green-500"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black via-gray-900 to-black flex items-center justify-center p-4">
+          <div className="max-w-2xl w-full">
+            {/* Header */}
+            <div className="text-center mb-8">
+              <div className="w-24 h-24 rounded-full bg-green-500/20 border-4 border-green-500 flex items-center justify-center mx-auto mb-6 animate-pulse">
+                <div className="text-4xl">🎮</div>
               </div>
-              <h2 className="text-4xl font-bold text-green-400 mb-4">Waiting for Game to Start</h2>
-              <p className="text-xl text-gray-400 mb-2">Lobby: {lobbyId.slice(0, 8)}...</p>
-              <p className="text-gray-500">Game will start when minimum players join</p>
+              <h2 className="text-5xl font-bold text-green-400 mb-3">Waiting Room</h2>
+              <p className="text-gray-400 text-lg">Lobby: {lobbyId.slice(0, 8)}...</p>
             </div>
-            <div className="flex items-center justify-center gap-2">
+
+            {/* Player Count */}
+            {lobbyInfo && (
+              <div className="bg-gradient-to-br from-gray-900 to-black border-2 border-green-500/30 rounded-2xl p-6 mb-6">
+                <div className="text-center mb-4">
+                  <div className="text-6xl font-bold text-green-400 mb-2">
+                    {lobbyInfo.current} / {lobbyInfo.required}
+                  </div>
+                  <p className="text-xl text-gray-400">
+                    {lobbyInfo.current >= lobbyInfo.required 
+                      ? '🎉 Starting soon...' 
+                      : `Waiting for ${lobbyInfo.required - lobbyInfo.current} more player${lobbyInfo.required - lobbyInfo.current !== 1 ? 's' : ''}...`
+                    }
+                  </p>
+                </div>
+
+                {/* Progress Bar */}
+                <div className="w-full bg-gray-800 rounded-full h-4 overflow-hidden">
+                  <div 
+                    className="bg-gradient-to-r from-green-500 to-emerald-500 h-full transition-all duration-500 rounded-full"
+                    style={{ width: `${(lobbyInfo.current / lobbyInfo.required) * 100}%` }}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Players List */}
+            <div className="bg-gradient-to-br from-gray-900 to-black border-2 border-green-500/30 rounded-2xl p-6">
+              <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+                <span>👥</span>
+                <span>Players in Lobby</span>
+              </h3>
+              
+              {lobbyPlayers.length > 0 ? (
+                <div className="space-y-2 max-h-64 overflow-y-auto">
+                  {lobbyPlayers.map((player, index) => (
+                    <div 
+                      key={player.id}
+                      className={`flex items-center gap-3 p-3 rounded-lg ${
+                        player.id === mySnakeId 
+                          ? 'bg-green-500/20 border-2 border-green-500' 
+                          : 'bg-gray-800/50 border border-gray-700'
+                      }`}
+                    >
+                      <div className="w-8 h-8 rounded-full bg-green-500/30 flex items-center justify-center font-bold text-green-400">
+                        {index + 1}
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-bold text-white">
+                          {player.nickname}
+                          {player.id === mySnakeId && (
+                            <span className="ml-2 text-xs bg-green-500 text-black px-2 py-1 rounded-full">YOU</span>
+                          )}
+                        </p>
+                      </div>
+                      <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  <p>No players yet...</p>
+                </div>
+              )}
+            </div>
+
+            {/* Loading Animation */}
+            <div className="flex items-center justify-center gap-2 mt-6">
               <div className="w-3 h-3 bg-green-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
               <div className="w-3 h-3 bg-green-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
               <div className="w-3 h-3 bg-green-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>

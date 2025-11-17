@@ -114,8 +114,20 @@ io.on('connection', (socket) => {
       
       lobby = lobbyManager.getLobby(data.lobbyId)
       console.log(`Lobby ${data.lobbyId} status: ${lobby?.status}, players: ${lobby?.players.length}`)
-      io.to(data.lobbyId).emit('lobby_update', lobby)
-      io.to(`spectate-${data.lobbyId}`).emit('lobby_update', lobby)
+      
+      // Send lobby update with player details
+      const lobbyUpdate = {
+        players: lobby?.players.map(playerId => ({
+          id: playerId,
+          nickname: lobbyManager.getPlayerNickname(playerId) || 'Player'
+        })) || [],
+        playerCount: lobby?.players.length || 0,
+        requiredPlayers: lobby?.minPlayers || 5,
+        status: lobby?.status
+      }
+      
+      io.to(data.lobbyId).emit('lobby_update', lobbyUpdate)
+      io.to(`spectate-${data.lobbyId}`).emit('lobby_update', lobbyUpdate)
     } else {
       console.log(`Failed to join lobby ${data.lobbyId}`)
       socket.emit('error', { message: 'Failed to join lobby' })
