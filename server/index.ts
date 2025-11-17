@@ -169,7 +169,7 @@ io.on('connection', (socket) => {
   })
 })
 
-// Game state broadcast loop
+// Game state broadcast loop (30Hz for better performance)
 setInterval(() => {
   // Broadcast to all active games
   const allLobbies = lobbyManager.getAllLobbies()
@@ -186,7 +186,7 @@ setInterval(() => {
       io.to(`spectate-${lobby.id}`).emit('game_state', state)
     }
   }
-}, 1000 / 60) // 60Hz broadcast
+}, 1000 / 30) // 30Hz broadcast (matches game tick rate)
 
 async function handleGameEnd(lobbyId: string, winnerId: string, stats: Map<string, any>) {
   try {

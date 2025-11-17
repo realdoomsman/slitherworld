@@ -36,8 +36,8 @@ export interface PlayerInput {
 }
 
 export const GAME_CONFIG = {
-  TICK_RATE: 60,
-  TICK_MS: 1000 / 60,
+  TICK_RATE: 30, // Reduced from 60 for better server performance
+  TICK_MS: 1000 / 30,
   MAP_WIDTH: 4000,
   MAP_HEIGHT: 4000,
   SNAKE_BASE_SPEED: 4,

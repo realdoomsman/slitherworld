@@ -107,17 +107,21 @@ export default function GameCanvas({ lobbyId, nickname, walletAddress }: GameCan
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
-    // Set canvas size
-    canvas.width = window.innerWidth
-    canvas.height = window.innerHeight
+    // Set canvas size only if changed
+    if (canvas.width !== window.innerWidth || canvas.height !== window.innerHeight) {
+      canvas.width = window.innerWidth
+      canvas.height = window.innerHeight
+    }
 
     // Find my snake
     const mySnake = gameState.snakes.find((s: any) => s.id === mySnakeId)
     
-    // Update camera to follow player
+    // Update camera to follow player (smooth)
     if (mySnake && mySnake.segments.length > 0) {
-      cameraRef.current.x = mySnake.segments[0].x - canvas.width / 2
-      cameraRef.current.y = mySnake.segments[0].y - canvas.height / 2
+      const targetX = mySnake.segments[0].x - canvas.width / 2
+      const targetY = mySnake.segments[0].y - canvas.height / 2
+      cameraRef.current.x += (targetX - cameraRef.current.x) * 0.1
+      cameraRef.current.y += (targetY - cameraRef.current.y) * 0.1
     }
 
     // Clear canvas
@@ -141,36 +145,40 @@ export default function GameCanvas({ lobbyId, nickname, walletAddress }: GameCan
       ctx.stroke()
     }
 
-    // Draw pellets
-    for (const pellet of gameState.pellets) {
+    // Draw pellets (optimized - batch by color)
+    const viewPadding = 50
+    const visiblePellets = gameState.pellets.filter((pellet: any) => {
       const x = pellet.position.x - cameraRef.current.x
       const y = pellet.position.y - cameraRef.current.y
+      return x > -viewPadding && x < canvas.width + viewPadding && 
+             y > -viewPadding && y < canvas.height + viewPadding
+    })
+
+    // Batch draw by color for performance
+    const pelletsByColor: { [key: string]: any[] } = {}
+    visiblePellets.forEach((pellet: any) => {
+      const radius = pellet.radius || 5
+      let color = '#fff'
+      if (radius <= 3) color = '#fff'
+      else if (radius <= 5) color = '#4ade80'
+      else color = '#fbbf24'
       
-      if (x > -20 && x < canvas.width + 20 && y > -20 && y < canvas.height + 20) {
+      if (!pelletsByColor[color]) pelletsByColor[color] = []
+      pelletsByColor[color].push(pellet)
+    })
+
+    // Draw each color batch
+    Object.entries(pelletsByColor).forEach(([color, pellets]) => {
+      ctx.fillStyle = color
+      pellets.forEach((pellet: any) => {
+        const x = pellet.position.x - cameraRef.current.x
+        const y = pellet.position.y - cameraRef.current.y
         const radius = pellet.radius || 5
-        
-        // Color based on size
-        if (radius <= 3) {
-          ctx.fillStyle = '#fff' // Small = white
-        } else if (radius <= 5) {
-          ctx.fillStyle = '#4ade80' // Medium = green
-        } else {
-          ctx.fillStyle = '#fbbf24' // Large = gold
-        }
-        
-        // Add glow for larger pellets
-        if (radius > 5) {
-          ctx.shadowBlur = 10
-          ctx.shadowColor = ctx.fillStyle
-        }
-        
         ctx.beginPath()
         ctx.arc(x, y, radius, 0, Math.PI * 2)
         ctx.fill()
-        
-        ctx.shadowBlur = 0
-      }
-    }
+      })
+    })
 
     // Draw snakes
     for (const snake of gameState.snakes) {
@@ -221,6 +229,9 @@ export default function GameCanvas({ lobbyId, nickname, walletAddress }: GameCan
   }, [gameState, mySnakeId])
 
   useEffect(() => {
+    let lastInputSent = 0
+    const INPUT_THROTTLE = 16 // ~60fps max
+
     const handleMouseMove = (e: MouseEvent) => {
       const canvas = canvasRef.current
       if (!canvas || !mySnakeId || !gameState) return
@@ -237,7 +248,13 @@ export default function GameCanvas({ lobbyId, nickname, walletAddress }: GameCan
       const angle = Math.atan2(dy, dx)
 
       inputRef.current.angle = angle
-      socketRef.current?.emit('player_input', inputRef.current)
+      
+      // Throttle input sending
+      const now = Date.now()
+      if (now - lastInputSent >= INPUT_THROTTLE) {
+        socketRef.current?.emit('player_input', inputRef.current)
+        lastInputSent = now
+      }
     }
 
     let isMouseDown = false
