@@ -45,7 +45,7 @@ export default function Home() {
           </div>
           <div className="flex gap-4">
             <a href="/leaderboard" className="px-4 py-2 text-gray-300 hover:text-green-400 transition-colors">
-              🏆 Leaderboard
+              Leaderboard
             </a>
           </div>
         </div>
@@ -63,10 +63,7 @@ export default function Home() {
 
         {/* Player Setup Card */}
         <div className="bg-gradient-to-br from-gray-900 to-black border-2 border-green-500/30 rounded-2xl p-6 mb-6 shadow-2xl">
-          <div className="flex items-center gap-2 mb-4">
-            <span className="text-2xl">👤</span>
-            <h2 className="text-xl font-bold text-green-400">Setup Your Player</h2>
-          </div>
+          <h2 className="text-xl font-bold text-green-400 mb-4">Setup Your Player</h2>
           
           <div className="space-y-4">
             {/* Nickname */}
@@ -87,7 +84,7 @@ export default function Home() {
             {/* Wallet */}
             <div>
               <label className="block text-sm font-bold text-gray-300 mb-2">
-                💰 Solana Wallet Address (for payouts)
+                Solana Wallet Address (for payouts)
               </label>
               <input
                 type="text"
@@ -97,7 +94,7 @@ export default function Home() {
                 className="w-full px-4 py-3 bg-black/50 border-2 border-gray-700 rounded-xl text-white font-mono text-sm focus:outline-none focus:border-green-500 transition-all"
               />
               <p className="text-xs text-gray-500 mt-2">
-                💡 Open Phantom wallet → Settings → Copy your wallet address
+                Open Phantom wallet → Settings → Copy your wallet address
               </p>
             </div>
           </div>
@@ -112,7 +109,6 @@ export default function Home() {
             className="group relative bg-gradient-to-br from-green-600 to-emerald-700 p-6 rounded-2xl border-2 border-green-400 hover:scale-105 hover:shadow-2xl hover:shadow-green-500/50 transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none"
           >
             <div className="text-center">
-              <div className="text-3xl mb-2">🎮</div>
               <h3 className="text-2xl font-bold mb-2">Free Play</h3>
               <div className="text-5xl font-black mb-3 text-yellow-300">FREE</div>
               <div className="space-y-1 text-sm">
@@ -135,7 +131,6 @@ export default function Home() {
             className="group relative bg-gradient-to-br from-purple-900 to-gray-900 p-6 rounded-2xl border-2 border-purple-500 hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/50 transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none"
           >
             <div className="text-center">
-              <div className="text-3xl mb-2">💎</div>
               <h3 className="text-2xl font-bold mb-2">Paid Game</h3>
               <div className="text-5xl font-black mb-3 text-yellow-300">0.25 SOL</div>
               <div className="space-y-1 text-sm">
@@ -153,21 +148,40 @@ export default function Home() {
         </div>
 
         {/* How to Play */}
-        <div className="bg-gray-900/50 border border-gray-800 rounded-2xl p-6">
+        <div className="bg-gray-900/50 border border-gray-800 rounded-2xl p-6 mb-6">
           <h3 className="text-lg font-bold text-center mb-4 text-gray-300">How to Play</h3>
           <div className="grid grid-cols-3 gap-4 text-center text-sm">
             <div>
-              <div className="text-3xl mb-2">🖱️</div>
-              <p className="text-gray-400">Mouse to move</p>
+              <p className="text-gray-400 font-bold mb-1">Move</p>
+              <p className="text-gray-500 text-xs">Mouse</p>
             </div>
             <div>
-              <div className="text-3xl mb-2">🚀</div>
-              <p className="text-gray-400">Click to boost</p>
+              <p className="text-gray-400 font-bold mb-1">Boost</p>
+              <p className="text-gray-500 text-xs">Click/Space</p>
             </div>
             <div>
-              <div className="text-3xl mb-2">🏆</div>
-              <p className="text-gray-400">Last one wins</p>
+              <p className="text-gray-400 font-bold mb-1">Win</p>
+              <p className="text-gray-500 text-xs">Last Alive</p>
             </div>
+          </div>
+        </div>
+
+        {/* Contract Address */}
+        <div className="bg-black/50 border border-gray-800 rounded-xl p-4">
+          <p className="text-xs text-gray-500 mb-2 text-center">Treasury Contract</p>
+          <div className="flex items-center justify-center gap-2">
+            <code className="text-xs text-green-400 font-mono">
+              GpWkVYPmc5rRFRXCRhdHH2zcSYExy19vwYeeG8GunVF7
+            </code>
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText('GpWkVYPmc5rRFRXCRhdHH2zcSYExy19vwYeeG8GunVF7')
+                alert('Copied!')
+              }}
+              className="text-xs text-gray-400 hover:text-green-400 transition-colors"
+            >
+              Copy
+            </button>
           </div>
         </div>
       </div>
