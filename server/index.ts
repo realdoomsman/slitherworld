@@ -61,24 +61,10 @@ io.on('connection', (socket) => {
     }
   })
 
-  socket.on('join_lobby', async (data: { lobbyId: string; spectate?: boolean; nickname?: string }) => {
-    console.log(`${data.spectate ? 'Spectator' : 'Player'} ${socket.id} joining lobby ${data.lobbyId}`)
+  socket.on('join_lobby', async (data: { lobbyId: string; nickname?: string }) => {
+    console.log(`Player ${socket.id} joining lobby ${data.lobbyId}`)
     
-    // Spectator mode - no authentication required
-    if (data.spectate) {
-      currentLobby = data.lobbyId
-      socket.join(`spectate-${data.lobbyId}`)
-      
-      const lobby = lobbyManager.getLobby(data.lobbyId)
-      socket.emit('spectator_joined', { 
-        lobbyId: data.lobbyId,
-        lobby,
-        message: 'You are now spectating'
-      })
-      return
-    }
-
-    // Player mode - requires authentication
+    // Requires authentication
     if (!authenticatedWallet) {
       socket.emit('error', { message: 'Not authenticated' })
       return
@@ -127,7 +113,6 @@ io.on('connection', (socket) => {
       }
       
       io.to(data.lobbyId).emit('lobby_update', lobbyUpdate)
-      io.to(`spectate-${data.lobbyId}`).emit('lobby_update', lobbyUpdate)
     } else {
       console.log(`Failed to join lobby ${data.lobbyId}`)
       socket.emit('error', { message: 'Failed to join lobby' })
@@ -181,9 +166,6 @@ setInterval(() => {
       
       // Broadcast to players
       io.to(lobby.id).emit('game_state', state)
-      
-      // Broadcast to spectators (same state, read-only)
-      io.to(`spectate-${lobby.id}`).emit('game_state', state)
     }
   }
 }, 1000 / 30) // 30Hz broadcast (matches game tick rate)

@@ -47,9 +47,6 @@ export default function Home() {
             <a href="/leaderboard" className="px-4 py-2 text-gray-300 hover:text-green-400 transition-colors">
               🏆 Leaderboard
             </a>
-            <a href="/live" className="px-4 py-2 text-gray-300 hover:text-purple-400 transition-colors">
-              📺 Watch Live
-            </a>
           </div>
         </div>
       </nav>

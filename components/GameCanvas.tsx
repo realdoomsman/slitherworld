@@ -462,12 +462,6 @@ export default function GameCanvas({ lobbyId, nickname, walletAddress }: GameCan
                     🎮 Play Again
                   </button>
                   <button
-                    onClick={() => window.location.href = '/live'}
-                    className="neon-button-outline px-10 py-4 rounded-xl font-bold text-xl smooth-transition"
-                  >
-                    👁️ Watch Live
-                  </button>
-                  <button
                     onClick={() => window.location.href = '/profile'}
                     className="px-10 py-4 bg-gray-800 hover:bg-gray-700 rounded-xl font-bold text-xl smooth-transition border-2 border-gray-700"
                   >
@@ -500,12 +494,6 @@ export default function GameCanvas({ lobbyId, nickname, walletAddress }: GameCan
                     className="neon-button px-10 py-4 rounded-xl font-bold text-xl smooth-transition"
                   >
                     🎮 Play Again
-                  </button>
-                  <button
-                    onClick={() => window.location.href = '/live'}
-                    className="neon-button-outline px-10 py-4 rounded-xl font-bold text-xl smooth-transition"
-                  >
-                    👁️ Watch Live
                   </button>
                 </div>
               </>
