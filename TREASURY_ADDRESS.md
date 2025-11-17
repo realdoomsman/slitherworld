@@ -1,10 +1,12 @@
 # 💰 Treasury Wallet Address
 
-## Current Treasury Address
+## Current Treasury Address (PUBLIC)
 
 ```
-98cTHUmkwPBj64dus3Uvmjwb5XkdHc1kSdoNrzPQZQgb
+GpWkVYPmc5rRFRXCRhdHH2zcSYExy19vwYeeG8GunVF7
 ```
+
+⚠️ **IMPORTANT**: The private key is stored securely in `.env` and should NEVER be shared or shown to users!
 
 ## What This Address Is Used For
 
@@ -30,12 +32,12 @@
 
 ## View on Solscan
 
-https://solscan.io/account/98cTHUmkwPBj64dus3Uvmjwb5XkdHc1kSdoNrzPQZQgb
+https://solscan.io/account/GpWkVYPmc5rRFRXCRhdHH2zcSYExy19vwYeeG8GunVF7
 
 ## Check Balance
 
 ```bash
-solana balance 98cTHUmkwPBj64dus3Uvmjwb5XkdHc1kSdoNrzPQZQgb
+solana balance GpWkVYPmc5rRFRXCRhdHH2zcSYExy19vwYeeG8GunVF7
 ```
 
 ## Important Notes
@@ -54,8 +56,8 @@ solana balance 98cTHUmkwPBj64dus3Uvmjwb5XkdHc1kSdoNrzPQZQgb
 ## Payment Flow
 
 ```
-Player Wallet → Treasury (98cTHU...) → Winner Wallet
-     0.25 SOL         (accumulates)        2.0 SOL prize
+Player Wallet → Treasury (GpWkVY...) → Winner Wallet
+     0.25 SOL        (accumulates)       2.0 SOL prize
 ```
 
 ## Example Transaction
@@ -63,13 +65,13 @@ Player Wallet → Treasury (98cTHU...) → Winner Wallet
 When a player pays:
 ```
 From: Player's wallet (e.g., 7xKXtg2CW87...)
-To: 98cTHUmkwPBj64dus3Uvmjwb5XkdHc1kSdoNrzPQZQgb
+To: GpWkVYPmc5rRFRXCRhdHH2zcSYExy19vwYeeG8GunVF7
 Amount: 0.25 SOL
 ```
 
 When you pay winner:
 ```
-From: 98cTHUmkwPBj64dus3Uvmjwb5XkdHc1kSdoNrzPQZQgb
+From: GpWkVYPmc5rRFRXCRhdHH2zcSYExy19vwYeeG8GunVF7
 To: Winner's wallet (shown on winner page)
 Amount: 2.0 SOL (or whatever the prize is)
 ```
