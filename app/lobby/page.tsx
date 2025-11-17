@@ -181,10 +181,22 @@ function LobbyContent() {
     alert('Copied to clipboard!')
   }
 
-  if (!mounted || !lobbyType || !lobbyId) {
+  if (!mounted || !lobbyType) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="w-16 h-16 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    )
+  }
+  
+  // Show loading while creating lobby
+  if (!lobbyId && status !== 'error') {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-green-400 text-xl">Creating lobby...</p>
+        </div>
       </div>
     )
   }
