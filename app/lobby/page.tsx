@@ -26,10 +26,53 @@ function LobbyContent() {
     setMounted(true)
     const type = searchParams.get('type')
     const savedNickname = localStorage.getItem('playerNickname') || ''
+    const savedWallet = localStorage.getItem('playerWallet') || ''
     
     setLobbyType(type)
     setNickname(savedNickname)
+    setWalletAddress(savedWallet)
+    
+    // Auto-create lobby if we have all info
+    if (type && savedNickname && savedWallet && !lobbyId) {
+      createLobbyAndJoin(type, savedNickname, savedWallet)
+    }
   }, [])
+  
+  const createLobbyAndJoin = async (type: string, nick: string, wallet: string) => {
+    try {
+      const res = await fetch('/api/lobby/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          lobbyType: type, 
+          nickname: nick,
+          walletAddress: wallet
+        }),
+      })
+
+      const data = await res.json()
+      
+      if (data.error) {
+        setErrorMessage(data.error)
+        setStatus('error')
+        return
+      }
+      
+      setLobbyId(data.lobbyId)
+      
+      // For FREE lobbies, go straight to game (waiting room)
+      if (type === 'FREE') {
+        router.push(`/game?lobby=${data.lobbyId}&nickname=${encodeURIComponent(nick)}&wallet=${encodeURIComponent(wallet)}`)
+      } else {
+        // For PAID lobbies, show payment screen
+        setStatus('payment')
+      }
+    } catch (error) {
+      console.error('Lobby creation error:', error)
+      setErrorMessage('Failed to create lobby')
+      setStatus('error')
+    }
+  }
 
   const handleSetupComplete = async () => {
     if (!walletAddress.trim() || walletAddress.trim().length < 32) {

@@ -21,6 +21,7 @@ export default function GameCanvas({ lobbyId, nickname, walletAddress }: GameCan
   const [killFeed, setKillFeed] = useState<Array<{ killer: string; victim: string; time: number }>>([])
   const [lobbyPlayers, setLobbyPlayers] = useState<Array<{ id: string; nickname: string }>>([])
   const [lobbyInfo, setLobbyInfo] = useState<{ current: number; required: number } | null>(null)
+  const [isConnecting, setIsConnecting] = useState(true)
   const inputRef = useRef({ angle: 0, boosting: false })
   const cameraRef = useRef({ x: 0, y: 0 })
 
@@ -33,6 +34,7 @@ export default function GameCanvas({ lobbyId, nickname, walletAddress }: GameCan
 
     socket.on('connect', () => {
       console.log('Socket connected, authenticating...')
+      setIsConnecting(false)
       socket.emit('authenticate', { 
         nickname,
         walletAddress 
@@ -42,6 +44,14 @@ export default function GameCanvas({ lobbyId, nickname, walletAddress }: GameCan
     socket.on('authenticated', (data: any) => {
       console.log('Authenticated, joining lobby:', lobbyId)
       setMySnakeId(socket.id || null)
+      
+      // Initialize waiting room immediately
+      setLobbyInfo({
+        current: 1,
+        required: 5
+      })
+      setLobbyPlayers([{ id: socket.id || '', nickname }])
+      
       socket.emit('join_lobby', { 
         lobbyId,
         nickname 
@@ -49,7 +59,7 @@ export default function GameCanvas({ lobbyId, nickname, walletAddress }: GameCan
     })
 
     socket.on('lobby_update', (data: any) => {
-      console.log('Lobby update:', data)
+      console.log('Lobby update received:', data)
       setLobbyPlayers(data.players || [])
       setLobbyInfo({
         current: data.playerCount || 0,
@@ -302,8 +312,13 @@ export default function GameCanvas({ lobbyId, nickname, walletAddress }: GameCan
               <div className="w-24 h-24 rounded-full bg-green-500/20 border-4 border-green-500 flex items-center justify-center mx-auto mb-6 animate-pulse">
                 <div className="text-4xl">🎮</div>
               </div>
-              <h2 className="text-5xl font-bold text-green-400 mb-3">Waiting Room</h2>
+              <h2 className="text-5xl font-bold text-green-400 mb-3">
+                {isConnecting ? 'Connecting...' : 'Waiting Room'}
+              </h2>
               <p className="text-gray-400 text-lg">Lobby: {lobbyId.slice(0, 8)}...</p>
+              {isConnecting && (
+                <p className="text-gray-500 text-sm mt-2">Connecting to server...</p>
+              )}
             </div>
 
             {/* Player Count */}
