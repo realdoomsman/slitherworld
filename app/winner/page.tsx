@@ -65,14 +65,14 @@ function WinnerContent() {
     <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black text-white">
       {/* Navigation */}
       <nav className="border-b border-green-500/20 bg-black/50 backdrop-blur-sm">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <img src="/icon.svg" alt="Logo" className="w-10 h-10" />
-            <span className="text-2xl font-bold text-green-400">SLITHER.WORLD</span>
+        <div className="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+          <div className="flex items-center gap-2 md:gap-3">
+            <img src="/icon.svg" alt="Logo" className="w-8 h-8 md:w-10 md:h-10" />
+            <span className="text-lg md:text-2xl font-bold text-green-400">SLITHER.WORLD</span>
           </div>
           <button
             onClick={() => router.push('/')}
-            className="px-4 py-2 text-gray-300 hover:text-green-400 transition-colors"
+            className="text-sm md:text-base px-3 py-2 md:px-4 text-gray-300 hover:text-green-400 transition-colors"
           >
             ← Home
           </button>
@@ -80,42 +80,42 @@ function WinnerContent() {
       </nav>
 
       {/* Winner Display */}
-      <div className="max-w-4xl mx-auto px-4 py-12">
+      <div className="max-w-4xl mx-auto px-4 py-6 md:py-12">
         {/* Trophy Animation */}
-        <div className="text-center mb-8">
-          <div className="text-9xl mb-6 animate-bounce">🏆</div>
-          <h1 className="text-6xl font-bold mb-4 bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 bg-clip-text text-transparent">
+        <div className="text-center mb-6 md:mb-8">
+          <div className="text-6xl md:text-9xl mb-4 md:mb-6">🏆</div>
+          <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 bg-clip-text text-transparent">
             WINNER!
           </h1>
         </div>
 
         {/* Winner Card */}
-        <div className="bg-gradient-to-br from-yellow-900/30 to-black border-4 border-yellow-500 rounded-3xl p-8 mb-8 shadow-2xl shadow-yellow-500/50">
-          <div className="text-center mb-6">
-            <p className="text-gray-400 text-lg mb-2">Champion</p>
-            <h2 className="text-5xl font-bold text-yellow-400 mb-4">
+        <div className="bg-gradient-to-br from-yellow-900/30 to-black border-2 md:border-4 border-yellow-500 rounded-2xl md:rounded-3xl p-4 md:p-8 mb-6 md:mb-8 shadow-2xl shadow-yellow-500/50">
+          <div className="text-center mb-4 md:mb-6">
+            <p className="text-gray-400 text-base md:text-lg mb-2">Champion</p>
+            <h2 className="text-3xl md:text-5xl font-bold text-yellow-400 mb-4">
               Winner
             </h2>
-            <div className="inline-block bg-yellow-500/20 border-2 border-yellow-500 rounded-xl px-6 py-3">
-              <p className="text-sm text-gray-400 mb-1">Prize Won</p>
-              <p className="text-4xl font-bold text-yellow-400">
+            <div className="inline-block bg-yellow-500/20 border-2 border-yellow-500 rounded-xl px-4 md:px-6 py-2 md:py-3">
+              <p className="text-xs md:text-sm text-gray-400 mb-1">Prize Won</p>
+              <p className="text-3xl md:text-4xl font-bold text-yellow-400">
                 {matchData.winnerPayout} SOL
               </p>
             </div>
           </div>
 
           {/* Winner Wallet */}
-          <div className="bg-black/50 border-2 border-yellow-500/30 rounded-xl p-6 mb-6">
-            <p className="text-sm text-gray-400 mb-2">Winner's Wallet Address</p>
-            <div className="flex items-center gap-3">
-              <code className="flex-1 text-yellow-400 font-mono text-sm break-all bg-black/50 p-3 rounded-lg">
+          <div className="bg-black/50 border-2 border-yellow-500/30 rounded-xl p-4 md:p-6 mb-4 md:mb-6">
+            <p className="text-xs md:text-sm text-gray-400 mb-2">Winner's Wallet Address</p>
+            <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 md:gap-3">
+              <code className="flex-1 text-yellow-400 font-mono text-xs md:text-sm break-all bg-black/50 p-3 rounded-lg">
                 {matchData.winner.walletAddress}
               </code>
               <button
                 onClick={() => copyToClipboard(matchData.winner.walletAddress)}
-                className="px-4 py-3 bg-yellow-600 hover:bg-yellow-500 rounded-lg font-bold whitespace-nowrap transition-colors"
+                className="px-4 py-3 bg-yellow-600 hover:bg-yellow-500 rounded-lg font-bold whitespace-nowrap transition-colors text-sm md:text-base"
               >
-                📋 Copy
+                Copy
               </button>
             </div>
           </div>
@@ -179,18 +179,18 @@ function WinnerContent() {
         </div>
 
         {/* Actions */}
-        <div className="flex gap-4 justify-center">
+        <div className="flex flex-col md:flex-row gap-3 md:gap-4 justify-center">
           <button
             onClick={() => router.push('/')}
-            className="px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 rounded-xl font-bold text-xl transition-all"
+            className="px-6 md:px-8 py-3 md:py-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 rounded-xl font-bold text-lg md:text-xl transition-all"
           >
-            🎮 Play Again
+            Play Again
           </button>
           <button
             onClick={() => router.push('/leaderboard')}
-            className="px-8 py-4 bg-gray-800 hover:bg-gray-700 border-2 border-gray-700 rounded-xl font-bold text-xl transition-all"
+            className="px-6 md:px-8 py-3 md:py-4 bg-gray-800 hover:bg-gray-700 border-2 border-gray-700 rounded-xl font-bold text-lg md:text-xl transition-all"
           >
-            🏆 Leaderboard
+            Leaderboard
           </button>
         </div>
       </div>

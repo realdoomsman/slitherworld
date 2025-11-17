@@ -185,13 +185,29 @@ function LobbyContent() {
   const lobbyInfo = LOBBY_INFO[lobbyType]
 
   return (
-    <div className="min-h-screen bg-black p-4 md:p-8">
-      <div className="max-w-2xl mx-auto">
+    <div className="min-h-screen bg-black">
+      {/* Navigation */}
+      <nav className="border-b border-gray-800 bg-gray-900/50 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <img src="/icon.svg" alt="Logo" className="w-8 h-8" />
+            <span className="text-lg md:text-xl font-bold text-green-400">SLITHER.WORLD</span>
+          </div>
+          <button 
+            onClick={() => router.push('/')}
+            className="text-sm md:text-base text-gray-400 hover:text-white transition-colors"
+          >
+            ← Back
+          </button>
+        </div>
+      </nav>
+
+      <div className="max-w-2xl mx-auto p-4 md:p-8">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-green-400 mb-2">{lobbyInfo.name} Lobby</h1>
-          {lobbyId && <p className="text-gray-400">Lobby ID: {lobbyId.slice(0, 8)}...</p>}
-          <p className="text-gray-400">Players: {lobbyInfo.players}</p>
+        <div className="text-center mb-6 md:mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold text-green-400 mb-2">{lobbyInfo.name} Lobby</h1>
+          {lobbyId && <p className="text-sm md:text-base text-gray-400">Lobby ID: {lobbyId.slice(0, 8)}...</p>}
+          <p className="text-sm md:text-base text-gray-400">Players: {lobbyInfo.players}</p>
         </div>
 
         {/* Setup: Enter Wallet Address */}
