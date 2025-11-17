@@ -24,6 +24,7 @@ export default function GameCanvas({ lobbyId, nickname, walletAddress }: GameCan
   const [isConnecting, setIsConnecting] = useState(true)
   const inputRef = useRef({ angle: 0, boosting: false })
   const cameraRef = useRef({ x: 0, y: 0 })
+  const lastInputSentRef = useRef(0)
 
   useEffect(() => {
     const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL!, {
@@ -85,6 +86,11 @@ export default function GameCanvas({ lobbyId, nickname, walletAddress }: GameCan
         winner: data.winnerId,
         payout: data.winnerPayout
       })
+      
+      // Redirect to winner page after 5 seconds
+      setTimeout(() => {
+        window.location.href = `/winner?match=${lobbyId}`
+      }, 5000)
     })
 
     socket.on('player_killed', (data: { killer: string; victim: string }) => {
@@ -229,8 +235,7 @@ export default function GameCanvas({ lobbyId, nickname, walletAddress }: GameCan
   }, [gameState, mySnakeId])
 
   useEffect(() => {
-    let lastInputSent = 0
-    const INPUT_THROTTLE = 16 // ~60fps max
+    const INPUT_THROTTLE = 50 // Send input every 50ms (20 times per second)
 
     const handleMouseMove = (e: MouseEvent) => {
       const canvas = canvasRef.current
@@ -251,9 +256,9 @@ export default function GameCanvas({ lobbyId, nickname, walletAddress }: GameCan
       
       // Throttle input sending
       const now = Date.now()
-      if (now - lastInputSent >= INPUT_THROTTLE) {
+      if (now - lastInputSentRef.current >= INPUT_THROTTLE) {
         socketRef.current?.emit('player_input', inputRef.current)
-        lastInputSent = now
+        lastInputSentRef.current = now
       }
     }
 
