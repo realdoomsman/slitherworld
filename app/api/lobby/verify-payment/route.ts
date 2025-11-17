@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Connection, PublicKey } from '@solana/web3.js'
 
-const TREASURY_ADDRESS = '4yG1SAYwJYhh7WHDbk7Bu8LHbkxfQ1dJVUf1RdkZniC4CvzjndxuYqw1bsfz9tztxHPK8hSUyW6M9hZ9esmXEsn7'
+const TREASURY_ADDRESS = '98cTHUmkwPBj64dus3Uvmjwb5XkdHc1kSdoNrzPQZQgb'
 
 export async function POST(request: NextRequest) {
   try {
