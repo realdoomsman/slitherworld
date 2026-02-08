@@ -176,6 +176,25 @@ export default function Home() {
             </div>
           </div>
         </div>
+
+        {/* Contract Address */}
+        <div className="bg-black/50 border border-gray-800 rounded-xl p-4">
+          <p className="text-xs text-gray-500 mb-2 text-center">Contract Address</p>
+          <div className="flex flex-col md:flex-row items-center justify-center gap-2">
+            <code className="text-xs text-green-400 font-mono break-all text-center">
+              6UNRwhBgpB4wLudWY7eDVHngHUWwmgpCUXDZdbTBpump
+            </code>
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText('6UNRwhBgpB4wLudWY7eDVHngHUWwmgpCUXDZdbTBpump')
+                alert('Copied!')
+              }}
+              className="text-xs text-gray-400 hover:text-green-400 transition-colors whitespace-nowrap"
+            >
+              Copy
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   )
