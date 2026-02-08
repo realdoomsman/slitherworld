@@ -28,7 +28,7 @@ export default function Home() {
       alert('Please enter your Solana wallet address!')
       return
     }
-    
+
     localStorage.setItem('playerNickname', nickname.trim())
     localStorage.setItem('playerWallet', walletAddress.trim())
     router.push(`/lobby?type=${type}`)
@@ -43,9 +43,20 @@ export default function Home() {
             <img src="/icon.svg" alt="Logo" className="w-10 h-10" />
             <span className="text-2xl font-bold text-green-400">SLITHER.WORLD</span>
           </div>
-          <div className="flex gap-4">
+          <div className="flex gap-4 items-center">
             <a href="/leaderboard" className="px-4 py-2 text-gray-300 hover:text-green-400 transition-colors">
               Leaderboard
+            </a>
+            <a
+              href="https://x.com/SlitherWorld"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-4 py-2 text-gray-300 hover:text-green-400 transition-colors flex items-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+              </svg>
+              Twitter
             </a>
           </div>
         </div>
@@ -64,7 +75,7 @@ export default function Home() {
         {/* Player Setup Card */}
         <div className="bg-gradient-to-br from-gray-900 to-black border-2 border-green-500/30 rounded-2xl p-6 mb-6 shadow-2xl">
           <h2 className="text-xl font-bold text-green-400 mb-4">Setup Your Player</h2>
-          
+
           <div className="space-y-4">
             {/* Nickname */}
             <div>
@@ -80,7 +91,7 @@ export default function Home() {
                 className="w-full px-4 py-3 bg-black/50 border-2 border-gray-700 rounded-xl text-white text-lg focus:outline-none focus:border-green-500 transition-all"
               />
             </div>
-            
+
             {/* Wallet */}
             <div>
               <label className="block text-sm font-bold text-gray-300 mb-2">
